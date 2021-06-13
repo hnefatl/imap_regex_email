@@ -153,7 +153,7 @@ class EmailContentSensor(SensorEntity):
         self.hass = hass
         self._email_reader = email_reader
         self._name = name
-        self._allowed_senders_regex = [sender.upper() for sender in allowed_senders_regex]
+        self._allowed_senders_regex = [sender for sender in allowed_senders_regex]
         self._value_template = value_template
         self._last_id = None
         self._message = None
@@ -188,10 +188,16 @@ class EmailContentSensor(SensorEntity):
     def sender_allowed(self, email_message):
         """Check if the sender is in the allowed senders list."""
         sender = EmailContentSensor.get_msg_sender(email_message)
-        return any(
+        matches = any(
             re.match(pattern, sender)
             for pattern in self._allowed_senders_regex
         )
+        _LOGGER.info(
+            "Email %s allowed senders: %s",
+            "matched" if matches else "did not match",
+            ','.join(self._allowed_senders_regex)
+        )
+        return matches
 
     @staticmethod
     def get_msg_sender(email_message):
@@ -243,6 +249,10 @@ class EmailContentSensor(SensorEntity):
     def update(self):
         """Read emails and publish state change."""
         email_message = self._email_reader.read_next()
+        _LOGGER.info(
+            "Read email with subject: %s",
+            EmailContentSensor.get_msg_subject(email_message)
+        )
 
         if email_message is None:
             self._message = None
