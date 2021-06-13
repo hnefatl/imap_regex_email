@@ -3,5 +3,6 @@
   "name": "IMAP Regex Email",
   "documentation": "https://www.home-assistant.io/integrations/imap_email_content",
   "codeowners": ["hnefatl@gmail.com"],
-  "iot_class": "cloud_push"
+  "iot_class": "cloud_push",
+  "version": "1.0.0"
 }
